@@ -23,24 +23,27 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN npm i -g yarn -y
 
-COPY package.json yarn.lock ./
-
 COPY . /var/www/html
+
+COPY .env.example /var/www/html/.env
 
 WORKDIR /var/www/html
 
 RUN chmod -R 775 . && chown -R www-data:www-data .
 
-# RUN composer install --optimize-autoloader --no-dev
+RUN composer install
 
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
+RUN php artisan key:generate \
+    && php artisan config:clear \
+    && php artisan config:cache \
+    && php artisan storage:link
 
-RUN cp .env.example .env 
+COPY package.json yarn.lock ./
 
-# RUN yarn install && yarn build
+RUN yarn config set network-timeout 100000 -g && yarn install && yarn build
 
-# RUN php artisan key:generate \ 
-#     php artisan migrate
+
+USER www-data
 
 EXPOSE 9000
 
