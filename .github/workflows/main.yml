@@ -59,7 +59,6 @@ jobs:
             cd ~
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/tamiyochi-laravel:latest
-            docker image prune
             docker compose down
             docker compose up -d
             docker exec -i app php artisan migrate --force
